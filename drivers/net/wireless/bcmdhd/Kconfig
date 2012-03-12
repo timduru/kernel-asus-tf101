@@ -46,6 +46,13 @@ config DHD_USE_STATIC_BUF
 	---help---
 	  Use memory preallocated in platform
 
+config DHD_USE_SCHED_SCAN
+	bool "Use CFG80211 sched scan"
+	depends on BCMDHD && CFG80211
+	default n
+	---help---
+	  Use CFG80211 sched scan
+
 config BCMDHD_WIFI_CONTROL_FUNC
 	bool "Use bcmdhd_wlan device"
 	depends on BCMDHD
