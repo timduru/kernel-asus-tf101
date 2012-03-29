@@ -67,3 +67,10 @@ config BCMDHD_HW_OOB
 	default n
 	---help---
 	  Use out of band interrupt for card interrupt and wake on wireless.
+
+config DHD_ENABLE_P2P
+	bool "Enable Wifi Direct"
+	depends on BCMDHD && CFG80211
+	default n
+	---help---
+	  Use Enable Wifi Direct
