@@ -243,7 +243,6 @@ int bcmsdh_probe(struct device *dev)
 	/* Read the vendor/device ID from the CIS */
 	vendevid = bcmsdh_query_device(sdh);
 
-
 	/* try to attach to the target device */
 	if (!(sdhc->ch = drvinfo.attach((vendevid >> 16),
 					func->device, 0, 0, 0, 0,
