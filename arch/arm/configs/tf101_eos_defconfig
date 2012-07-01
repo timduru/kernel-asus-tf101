@@ -1159,9 +1159,9 @@ CONFIG_WLAN=y
 # CONFIG_ATH_COMMON is not set
 # CONFIG_BCM4329 is not set
 CONFIG_BCMDHD=y
-CONFIG_BCMDHD_FW_DIR="/vendor/firmware"
-CONFIG_BCMDHD_NVRAM_DIR="/data/misc/wifi"
-CONFIG_BCMDHD_NVRAM_PATH="/system/etc/nvram.txt"
+CONFIG_BCMDHD_FW_DIR="/system/vendor/firmware"
+CONFIG_BCMDHD_NVRAM_DIR="/system/etc"
+CONFIG_BCMDHD_NVRAM_PATH="/data/misc/wifi/nvram.txt"
 # CONFIG_DHD_USE_STATIC_BUF is not set
 CONFIG_BCMDHD_WIFI_CONTROL_FUNC=y
 CONFIG_BCMDHD_HW_OOB=y
