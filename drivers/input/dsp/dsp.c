@@ -442,7 +442,18 @@ static int fm34_suspend(struct i2c_client *client, pm_message_t mesg)
 }
 static int fm34_resume(struct i2c_client *client)
 {
+	int ret = 0;
+
 	printk("fm34_resume+\n");
+	fm34_reconfig();
+	msleep(TIME_WAKEUP_TO_PROGRAMMING);
+	FM34_INFO("Audio output event enabled, bypass DSP\n");
+	gpio_set_value(TEGRA_GPIO_PH3, 1);
+	msleep(TIME_WAKEUP_TO_PROGRAMMING);
+	ret = i2c_master_send(dsp_chip->client, (u8 *)bypass_parameter, sizeof(bypass_parameter));
+	msleep(5);
+	gpio_set_value(TEGRA_GPIO_PH3, 0); /* Bypass DSP */
+	pr_info("gpio %d set to %d\n", TEGRA_GPIO_PH3, gpio_get_value(TEGRA_GPIO_PH3));
 	printk("fm34_resume-\n");
 	return 0;
 }
