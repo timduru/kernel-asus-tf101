@@ -146,7 +146,3 @@ config HEADSET_FUNCTION
 	tristate "Headset detection function"
         default n    
 
-
-config TEGRA_VOODOO_SOUND
-    tristate "Voodoo sound"
-    default m
