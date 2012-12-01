@@ -548,3 +548,13 @@ config MMC_USHC
 
 	  Note: These controllers only support SDIO cards and do not
 	  support MMC or SD memory cards.
+
+config MMC_SDHCI_NATIVE_BLOCKSIZE	
+	bool "Use Host Controller's actual blocksize"	
+  	depends on MMC_SDHCI && EXPERIMENTAL	
+  	default y
+  	help	
+    	  Normally, the SDHCI host controller will limit the xfer blocksize
+    	  to 512 bytes, even if the hardware host controller can do more.	
+    	  This option uses the maximum blocksize supported by the hardware.
+    	  I have seen no corruption on a Tegra2, but massive reduction of ui lags.
