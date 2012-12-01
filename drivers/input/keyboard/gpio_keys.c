@@ -357,13 +357,13 @@ static void gpio_keys_report_event(struct gpio_button_data *bdata)
 	input_event(input, type, button->code, !!state);
 	input_sync(input);
 	if ((type == EV_SW) && (ASUSGetProjectID() == 102)){
-		if (state == 0)
+		if (state == 1)
 			asusec_close_keyboard();
 		else
 			asusec_open_keyboard();
 	}
 	else if ((type == EV_SW) && (ASUSGetProjectID() == 101)){
-		if (state == 1){
+		if (state == 0){
 			GPIOKEYS_INFO("call asusec_dock_resume\n");
 				asusec_dock_resume();
 		}
@@ -426,6 +426,10 @@ static int __devinit gpio_keys_setup_key(struct platform_device *pdev,
 	struct device *dev = &pdev->dev;
 	unsigned long irqflags;
 	int irq, error;
+
+	if ( (button->type == EV_SW) && (ASUSGetProjectID() == 101) ) {
+        button->active_low = 1;
+    	}
 
 	setup_timer(&bdata->timer, gpio_keys_timer, (unsigned long)bdata);
 	INIT_WORK(&bdata->work, gpio_keys_work_func);
