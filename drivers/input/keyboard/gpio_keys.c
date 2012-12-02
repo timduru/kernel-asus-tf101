@@ -50,6 +50,12 @@
 #define GPIOKEYS_INFO(format, arg...)
 #endif
 
+#ifdef CONFIG_KEYBOARD_GPIO_LIDPATCH
+	static bool lidpatch_enabled = true;
+#else
+	static bool lidpatch_enabled = false;
+#endif
+
 #define GPIOKEYS_ERR(format, arg...)	\
 	printk(KERN_ERR "gpio-keys: [%s] " format , __FUNCTION__ , ## arg)
 struct gpio_button_data {
@@ -69,10 +75,11 @@ struct gpio_keys_drvdata {
 	void (*disable)(struct device *dev);
 	struct gpio_button_data data[0];
 };
+#ifdef CONFIG_ASUSEC
 extern int asusec_open_keyboard(void);
 extern int asusec_close_keyboard(void);
 extern int asusec_dock_resume(void);
-
+#endif
 /*
  * SYSFS interface for enabling/disabling keys and switches:
  *
@@ -119,6 +126,25 @@ static inline int get_n_events_by_type(int type)
 	BUG_ON(type != EV_SW && type != EV_KEY);
 
 	return (type == EV_KEY) ? KEY_CNT : SW_CNT;
+}
+
+static inline ssize_t gpio_keys_show_enabled_lidpatch(struct device *dev,
+                                              struct device_attribute *attr,
+                                              char *buf)
+{
+        return sprintf(buf, "%i\n", lidpatch_enabled);
+}
+
+static inline ssize_t gpio_keys_store_enabled_lidpatch(struct device *dev,
+                                               struct device_attribute *attr,
+                                               const char *buf, size_t size)
+{
+	printk("lidpatch_enabled before=%i", lidpatch_enabled);
+        unsigned short sw;
+        if (sscanf(buf, "%hu", &sw) == 1) 
+		lidpatch_enabled = (sw==1);
+	printk("lidpatch_enabled after=%i", lidpatch_enabled);
+        return size;
 }
 
 /**
@@ -291,6 +317,7 @@ ATTR_SHOW_FN(keys, EV_KEY, false);
 ATTR_SHOW_FN(switches, EV_SW, false);
 ATTR_SHOW_FN(disabled_keys, EV_KEY, true);
 ATTR_SHOW_FN(disabled_switches, EV_SW, true);
+//ATTR_SHOW_FN(enabled_lidpatch, EV_SW, false);
 
 /*
  * ATTRIBUTES:
@@ -320,6 +347,7 @@ static ssize_t gpio_keys_store_##name(struct device *dev,		\
 
 ATTR_STORE_FN(disabled_keys, EV_KEY);
 ATTR_STORE_FN(disabled_switches, EV_SW);
+//ATTR_STORE_FN(enabled_lidpatch, EV_SW);
 
 /*
  * ATTRIBUTES:
@@ -334,11 +362,16 @@ static DEVICE_ATTR(disabled_switches, S_IWUSR | S_IRUGO,
 		   gpio_keys_show_disabled_switches,
 		   gpio_keys_store_disabled_switches);
 
+static DEVICE_ATTR(enabled_lidpatch, S_IWUSR | S_IRUGO,
+		   gpio_keys_show_enabled_lidpatch,
+		   gpio_keys_store_enabled_lidpatch);
+
 static struct attribute *gpio_keys_attrs[] = {
 	&dev_attr_keys.attr,
 	&dev_attr_switches.attr,
 	&dev_attr_disabled_keys.attr,
 	&dev_attr_disabled_switches.attr,
+	&dev_attr_enabled_lidpatch.attr,
 	NULL,
 };
 
@@ -356,18 +389,22 @@ static void gpio_keys_report_event(struct gpio_button_data *bdata)
 	GPIOKEYS_INFO("type = %d, code = %d, state = %d\n", type, button->code, state);
 	input_event(input, type, button->code, !!state);
 	input_sync(input);
+#ifdef CONFIG_ASUSEC	
 	if ((type == EV_SW) && (ASUSGetProjectID() == 102)){
-		if (state == 1)
+		int val = lidpatch_enabled?1:0;
+		if (state == val) //lidpatch
 			asusec_close_keyboard();
 		else
 			asusec_open_keyboard();
 	}
 	else if ((type == EV_SW) && (ASUSGetProjectID() == 101)){
-		if (state == 0){
+		int val = lidpatch_enabled?0:1;
+		if (state == val){ //lidpatch
 			GPIOKEYS_INFO("call asusec_dock_resume\n");
 				asusec_dock_resume();
 		}
 	}
+#endif	
 }
 
 static void gpio_keys_work_func(struct work_struct *work)
@@ -427,9 +464,10 @@ static int __devinit gpio_keys_setup_key(struct platform_device *pdev,
 	unsigned long irqflags;
 	int irq, error;
 
-	if ( (button->type == EV_SW) && (ASUSGetProjectID() == 101) ) {
-        button->active_low = 1;
-    	}
+//lidpatch
+	if ( lidpatch_enabled && (button->type == EV_SW) && (ASUSGetProjectID() == 101) ) {
+	button->active_low = 1;
+	}
 
 	setup_timer(&bdata->timer, gpio_keys_timer, (unsigned long)bdata);
 	INIT_WORK(&bdata->work, gpio_keys_work_func);

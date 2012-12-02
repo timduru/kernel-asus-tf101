@@ -193,6 +193,14 @@ config KEYBOARD_GPIO_POLLED
 	  To compile this driver as a module, choose M here: the
 	  module will be called gpio_keys_polled.
 
+config KEYBOARD_GPIO_LIDPATCH
+        bool "GPIO LidPatch"
+        depends on GENERIC_GPIO
+	default y
+        help 
+		saying yes will activate the aosp like lidpatch logic 
+		saying no will keep it compatible with the original ASUS rom logic
+
 config KEYBOARD_INTERRUPT
 	tristate "Interrupt Buttons"
 	default n
