@@ -11,8 +11,10 @@ NAME = Flesh-Eating Bats with Fangs
 # Use 1 for a basic optimizations set.
 # Use 2 for an advanced optimizations set.
 # NOTE: You MUST set this variable, else compiling will fail.
+# NOTE2: If you are compiling using a non-linaro-gcc, you HAVE to use EOS=0.
+# Else compilation will error out.
 
-EOS=2
+EOS=0
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
@@ -389,12 +391,31 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
+ifeq ($(EOS),2)
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks \
-		  -mno-unaligned-access
+		   -mno-unaligned-access
+endif
+
+ifeq ($(EOS),1)
+KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+		   -fno-strict-aliasing -fno-common \
+		   -Werror-implicit-function-declaration \
+		   -Wno-format-security \
+		   -fno-delete-null-pointer-checks \
+		   -mno-unaligned-access
+endif
+
+ifeq ($(EOS),0)
+KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+		   -fno-strict-aliasing -fno-common \
+		   -Werror-implicit-function-declaration \
+		   -Wno-format-security \
+		   -fno-delete-null-pointer-checks
+endif
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
