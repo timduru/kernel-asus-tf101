@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux/arm 2.6.39.4 Kernel Configuration
-# Tue Feb 21 22:10:51 2012
+# Sat Feb  9 18:53:32 2013
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -2039,7 +2039,8 @@ CONFIG_SND_SOC_WM8903=y
 # CONFIG_SOUND_PRIME is not set
 CONFIG_HID_SUPPORT=y
 CONFIG_HID=y
-# CONFIG_HIDRAW is not set
+CONFIG_HIDRAW=y
+CONFIG_UHID=y
 
 #
 # USB Input Devices
