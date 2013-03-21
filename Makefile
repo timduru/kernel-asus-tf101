@@ -14,7 +14,7 @@ NAME = Flesh-Eating Bats with Fangs
 # NOTE2: If you are compiling using a non-linaro-gcc, you HAVE to use EOS=0.
 # Else compilation will error out.
 
-EOS=0
+EOS=2
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
